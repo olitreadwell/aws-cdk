@@ -11,7 +11,7 @@
  *
  * ## Type index
  *
- * This is necessary for backwards compatibiltiy with SDKv2 which used to accept string
+ * This is necessary for backwards compatibility with SDKv2 which used to accept string
  * arguments liberally, but SDKv3 no longer does so we need to do the conversion ourselves.
  *
  * We are building a state machine for every shape. The state machine looks like this:
