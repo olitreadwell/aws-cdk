@@ -867,7 +867,7 @@ console.log('This cannot be covered')
 
 > [!NOTE]
 > If your PR is failing one of the required checks (e.g Codecov), it will not be auto-merged. If you believe the PR should be merged
-> inspite of this, let a maintainer know. The maintainer may agree and merge the PR manually, or ask you to address the failing checks.
+> in spite of this, let a maintainer know. The maintainer may agree and merge the PR manually, or ask you to address the failing checks.
 
 
 ## Breaking Changes
@@ -1357,7 +1357,7 @@ Adding a new flag looks as follows:
       - recommendedValue: This is the boolean value will be set in `cdk.json` on `cdk init` when you init a new application.
     - As a contributor, if you are advised to introduce a feature flag, consider the following scenarios when determining how your feature should behave for
       - Customers who are creating new app (`cdk init`). `cdk.json` will now contain the new feature flag set to the `recommendedValue`.
-      - Customers who have an existing app. `cdk.json` doesnt contain the `new` feature flag. The value of the new feature flag set to the `default.v2` value in context of cdk commands.
+      - Customers who have an existing app. `cdk.json` doesn't contain the `new` feature flag. The value of the new feature flag set to the `default.v2` value in context of cdk commands.
       - E.g. in the following case, unless overridden in `cdk.json`
         - New apps will get [USE_CDK_MANAGED_LAMBDA_LOGGROUP]: true
         - Existing apps on cdk v2 will get [USE_CDK_MANAGED_LAMBDA_LOGGROUP]: false

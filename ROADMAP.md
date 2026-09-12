@@ -43,7 +43,7 @@ For reference, below are the stages of a construct module lifecycle.
 3. **Stage 2 - Developer Preview:** The goal of developer preview is to deliver a release candidate with a stable API to conduct user acceptance testing and accumulate sufficient usage to declare a module is ready for general availability. We will only make breaking changes to developer preview modules when required to address unforeseen customer use cases or issues.
 4. **Stage 3 - General Availability(GA):** The module is generally available with a backwards compatible guarantee across minor versions.
 
-Kindly refer to the [construct module lifecyle](https://github.com/aws/aws-cdk-rfcs/blob/main/text/0107-construct-library-module-lifecycle.md) for details on the different stages of a construct. 
+Kindly refer to the [construct module lifecycle](https://github.com/aws/aws-cdk-rfcs/blob/main/text/0107-construct-library-module-lifecycle.md) for details on the different stages of a construct. 
 
 **_Recent Releases_**
  
@@ -99,7 +99,7 @@ Developers love CDK because it provides them with the ability to configure and m
 **_Work Planned_**
  
 * **Give assets a display name:** This [feature](https://github.com/aws/aws-cdk/issues/9628) allows specifying a display name for AWS CDK assets to improve clarity in asset publishing and deployment.
-* **Enhanced L1 constructs:** This [rfc](https://github.com/aws/aws-cdk-rfcs/pull/657) is a proposal to enhance the L1 constructs by adding support for enums, resource interfaces, and CFN contraints to generated L1s.
+* **Enhanced L1 constructs:** This [rfc](https://github.com/aws/aws-cdk-rfcs/pull/657) is a proposal to enhance the L1 constructs by adding support for enums, resource interfaces, and CFN constraints to generated L1s.
 * **CLI: Enable client-side telemetry and analytics:** This [change]((https://github.com/aws/aws-cdk/issues/32010)) is to enable client-side telemetry and analytics collection in the CDK CLI.
 
 **_Research Items_**
@@ -119,7 +119,7 @@ These features allow CDK to grow beyond its initial scope and adapt to different
 
 * **Improved governance and compliance capabilities:** We'll explore developing a native policy-as-code features with pre-defined rule packs for common security guardrails (IAM policy restrictions, encryption requirements, public access controls) and enable custom rule-pack creation that integrates the CDK development lifecycle. This aims to provide Central IT teams better control and allows them to build guardrails to adhere to organizational best practices. 
 
-* **Partner integrations** Explore partner opportunities to accelerate adoption of CDK by Terraform, Pulumi, and Open Tofu users through joint intiatives with partner organizations.
+* **Partner integrations** Explore partner opportunities to accelerate adoption of CDK by Terraform, Pulumi, and Open Tofu users through joint initiatives with partner organizations.
 
 ## Community Engagement
 
