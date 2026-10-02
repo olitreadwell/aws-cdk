@@ -18,7 +18,7 @@ comment:
 component_management:
   default_rules:
     statuses:
-      # every component will produce its own status check that requires overall coverage doesnt decrease
+      # every component will produce its own status check that requires overall coverage doesn't decrease
       - type: project
         target: auto
       # every component will produce its own status check that requires patch coverage of at least 95%

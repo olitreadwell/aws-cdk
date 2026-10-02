@@ -1,5 +1,5 @@
 /**
- * Yarn v1 doesn't repect --frozen-lockfile entirely when using yarn workspaces.
+ * Yarn v1 doesn't respect --frozen-lockfile entirely when using yarn workspaces.
  * The net effect is that if a dependency in one of our packages is not in the yarn.lock file,
  * yarn will happily install any/latest version of that package, even when --frozen-lockfile
  * is provided.
