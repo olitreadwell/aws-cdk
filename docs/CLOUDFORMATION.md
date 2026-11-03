@@ -108,7 +108,7 @@ Resources can be deleted during 3 operations:
 
 Because a Stack Update operation must be able to be rolled back, and deletes are
 not possible to roll back in general, a Stack Update is done in 2 phases: first
-rollback-able changes and then deletes. Succesful updates to through the
+rollback-able changes and then deletes. Successful updates to through the
 following state sequence:
 
 ```
