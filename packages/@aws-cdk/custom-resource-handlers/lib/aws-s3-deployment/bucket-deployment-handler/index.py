@@ -12,7 +12,7 @@ from zipfile import ZipFile
 
 import boto3
 from botocore.config import Config
-from botocore.exceptions import WaiterError
+from botocore.exceptions import ClientError, WaiterError
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -74,6 +74,7 @@ def handler(event, context):
             include             = props.get('Include', [])
             sign_content        = props.get('SignContent', 'false').lower() == 'true'
             output_object_keys  = props.get('OutputObjectKeys', 'true') == 'true'
+            output_object_version_ids = props.get('OutputObjectVersionIds', 'false') == 'true'
 
             # backwards compatibility - if "SourceMarkers" is not specified,
             # assume all sources have an empty market map
@@ -141,13 +142,22 @@ def handler(event, context):
         if request_type == "Update" or request_type == "Create":
             s3_deploy(s3_source_zips, s3_dest, user_metadata, system_metadata, prune, exclude, include, source_markers, extract, source_markers_config)
 
+        # after the sync has run, optionally look up the S3 version IDs of the deployed objects.
+        # only performed when the consumer opted in by reading `objectVersionIds` (extract=false).
+        object_version_ids = []
+        if output_object_version_ids and (request_type == "Update" or request_type == "Create"):
+            object_version_ids = get_object_version_ids(dest_bucket_name, dest_bucket_prefix, source_object_keys)
+
         if distribution_id:
             cloudfront_invalidate(distribution_id, distribution_paths, wait_for_distribution_invalidation)
 
         cfn_send(event, context, CFN_SUCCESS, physicalResourceId=physical_id, responseData={
             # Passing through the ARN sequences dependencees on the deployment
             'DestinationBucketArn': props.get('DestinationBucketArn'),
-            **({'SourceObjectKeys': props.get('SourceObjectKeys')} if output_object_keys else {'SourceObjectKeys': []})
+            **({'SourceObjectKeys': props.get('SourceObjectKeys')} if output_object_keys else {'SourceObjectKeys': []}),
+            # When requested, always include the key (even on delete/no-op, where the list is empty)
+            # so Fn::GetAtt on SourceObjectVersionIds never fails. Omitted entirely when not requested.
+            **({'SourceObjectVersionIds': object_version_ids} if output_object_version_ids else {})
         })
     except KeyError as e:
         cfn_error("invalid request. Missing key %s" % str(e))
@@ -232,6 +242,39 @@ def s3_deploy(s3_source_zips, s3_dest, user_metadata, system_metadata, prune, ex
     finally:
         if not os.getenv(ENV_KEY_SKIP_CLEANUP):
             shutil.rmtree(workdir)
+
+#---------------------------------------------------------------------------------------------------
+# look up the S3 version IDs of the deployed objects.
+#
+# for extract=false each source zip is copied through unchanged, so the destination key is
+# "<dest_bucket_prefix><basename(source_object_key)>" (aws s3 cp preserves the basename and
+# aws s3 sync mirrors the working directory). the returned list positionally matches
+# source_object_keys. head_object on an unversioned bucket returns no VersionId, in which case
+# an empty string is returned for that entry.
+def get_object_version_ids(dest_bucket_name, dest_bucket_prefix, source_object_keys):
+    # Normalize the prefix the same way `aws s3 sync` does: syncing a directory to
+    # "s3://bucket/<prefix>" writes objects at "<prefix>/<name>" even when <prefix> has no
+    # trailing slash, so join with a single "/" to match the key that was actually written.
+    prefix = dest_bucket_prefix
+    if prefix and not prefix.endswith("/"):
+        prefix += "/"
+    version_ids = []
+    for key in source_object_keys:
+        dest_key = prefix + os.path.basename(key)
+        try:
+            resp = s3.head_object(Bucket=dest_bucket_name, Key=dest_key)
+            version_ids.append(resp.get('VersionId', ''))
+        except ClientError as e:
+            # The object may legitimately be absent at this point (for example when an
+            # include/exclude filter skipped it during the sync). Return an empty version id for it
+            # rather than failing the whole deployment, and log the key so an unexpected miss is
+            # still diagnosable in CloudWatch.
+            if e.response.get('Error', {}).get('Code') in ('404', 'NoSuchKey', 'NotFound'):
+                logger.info("| no object found at s3://%s/%s; returning empty version id" % (sanitize_message(dest_bucket_name), sanitize_message(dest_key)))
+                version_ids.append('')
+            else:
+                raise
+    return version_ids
 
 #---------------------------------------------------------------------------------------------------
 # invalidate files in the CloudFront distribution edge caches
